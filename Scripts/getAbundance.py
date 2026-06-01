@@ -3,7 +3,7 @@ import sys
 import re
 
 def findAbundance(iso):
-    dir = "./neucbot/Data/"
+    dir = "./Data/"
     fname = dir + "abundances.dat"
     f = open(fname)
     tokens = map(lambda line: re.split(" ", line), f.readlines())
