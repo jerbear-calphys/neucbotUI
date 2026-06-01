@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1 style="text-align: center;">{% block title %}NeuCBOT{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <!-- Script that checks if the user entered data correctly -->
+  <script>
+    function validateForm(inputs) 
+    {
+      let matFile = document.getElementById("matfile").value;
+      let matText = document.getElementById("material").value;
+
+      let alphaFile = document.getElementById("alphafile").value;
+      let alphaText = document.getElementById("alpha_chain").value;
+
+      if ((matFile && matText) || (!matFile && !matText) || (alphaFile && alphaText) || (!alphaFile && !alphaText)) 
+      {
+        event.preventDefault(); //prevent submission if user enters no or both fields for requested data
+        alert("Please fill only one field for each category")
+      }
+    }
+  </script>
+
+  <!-- Form for collecting user-inputted data -->
+  <form method="POST" action="{{ url_for('calc.calc') }}" onsubmit="validateForm(event)" enctype="multipart/form-data" >
+
+    <label for="alpha_chain">Alpha Chain</label>
+    <textarea rows="3" cols="20" placeholder = "enter alpha energies" name="alpha_chain" id="alpha_chain"></textarea>
+    <input type="file" id="alphafile" name="alphafile" >
+
+    <label for="material">Material</label>
+    <textarea rows="3" cols="20" placeholder = "enter material composition" name="material" id="material"></textarea>
+    <input type="file" id="matfile" name="matfile" >
+
+    <label for="a_energy_calculation"> Run Calculation w/ Alpha Energy Loss</label>
+    <input type="checkbox" id="a_energy_calculation" name="a_energy_calculation" value="True">
+
+    <br>
+    <button style="display: flex; justify-content: center;">Run Chain List Calculation</button>
+    <button style="display: flex; justify-content: center;">Run Alphas List Calculation</button>
+  </form>
+
+  <!-- Prints data that user inputted (need to fix, won't show)-->
+  {% if alpha_chain, material%}
+  <p>Alphas: </p>
+    {%for a in alphas_list%}
+      <li>{{a}}</li>
+    {%endfor%}
+
+  <p>Material Composition: </p>
+    {%for m in mat_list%}
+      <li>{{m}}</li>
+    {%endfor%}
+
+  <!-- Displays cross sections -->
+  <p>(a,n) cross sections:</p>
+  <ul>
+    {% for x in xsect %}
+      <li>{{x}} {{'{0:.2e}'.format(xsect[x])}} </li>
+    {% endfor %}
+  </ul>
+
+  <!--<p>Neutron Spectrum:</p> MAKE OPTIONAL
+  <ul>
+    {% for n in nspec %}
+      <li>{{n}} {{'{0:.2e}'.format(nspec[n])}} </li>
+    {% endfor %}
+  </ul> add button to pull information instead of pulling by default--> 
+
+  
+  <ul>
+    
+    <img src="data:image/png;base64,{{ ngraph }}" alt="Graph" style="margin: 25px;">
+
+    <!-- Code that allows user to select from list of graphs for (a,n) prob spectrums -->
+    {% if graph_list is defined and graph_list %}
+      <h2>Select Neutron Energy:</h2>
+      <!-- Input slider that allows user to select En through updateGraph function -->
+      <input type="range" id="energy-slider" min="100" max="14800" value="100" step="100"
+          oninput="updateGraph(this.value)">
+
+      <!-- Displays selected En -->
+      <p>Energy: <span id="selected-energy">100</span> keV</p>
+
+      <!-- displays graph-->
+      <img id="graph-image" src="data:image/png;base64,{{ graph_list[100] }}" alt="Probability Graph">
+
+      <script>
+          var graphs = {{ graph_list|tojson }};
+
+          //function updates graph selecting from list based on user input 'index'
+          function updateGraph(index) 
+          {
+              document.getElementById("selected-energy").innerText = index;
+              //var gr_str = "data:image/png;base64,{{ graph_list[" + index.toString() + "] }}"; 
+              document.getElementById("graph-image").src = "data:image/png;base64," + graphs[index];
+          }
+      </script>
+    {%endif%}
+
+    <!-- 2d histogram -->
+    <img src="data:image/png;base64,{{ hist }}" alt="Graph">
+
+  {%endif%}
+
+{% endblock %}

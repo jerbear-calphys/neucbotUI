@@ -3,7 +3,7 @@
 
 import sys
 import os
-sys.path.insert(0, 'neucbot/Scripts/')    # vscode suggests better solution via adding './Scripts' to extraPass
+sys.path.insert(0, './Scripts/')    # vscode suggests better solution via adding './Scripts' to extraPass
 import subprocess
 import shutil
 
@@ -66,7 +66,7 @@ class material:
 
 
 def isoDir(ele, A): # example './Data/Isotopes/Be/Be9/'
-    return 'neucbot/Data/Isotopes/'+ele.capitalize()+'/'+ele.capitalize()+str(int(A))+'/'
+    return './Data/Isotopes/'+ele.capitalize()+'/'+ele.capitalize()+str(int(A))+'/'
 
 
 
@@ -92,7 +92,7 @@ def parseIsotope(iso):  # returns [ele, A]
 
 
 def generateAlphaFileName(ele, A):  # returns fName
-    outdir = 'neucbot/AlphaLists/'
+    outdir = './AlphaLists/'
     fName = outdir + ele.capitalize() + str(A) + 'Alphas.dat'
     return fName
 
@@ -137,7 +137,7 @@ def getAlphaListIfExists(ele, A):
     return getAlphaList(ele, A)
 
 
-def loadChainAlphaList(f):  # returns list [E_alpha, Intesity] for each isotop in chain 
+def loadChainAlphaList(f):  # returns list [E_alpha, Intesity] for each isotope in chain 
     #f = open(fname) # fname = Chains/Th232Chain.dat  
     alpha_list = []
     if isinstance(f,str) == False:
@@ -276,7 +276,7 @@ def calcStoppingPower(e_alpha_MeV, mat_comp):
 
     # Then, for each element, get the stopping power at this alpha energy
     for mat in mat_comp_reduced:
-        spDir = 'neucbot/Data/StoppingPowers/'
+        spDir = './Data/StoppingPowers/'
         spFile = spDir + mat.lower() + '.dat'
         spf = open(spFile)
 
@@ -620,14 +620,14 @@ def n_prob_spec(nspec, total):
 def download_talys_data(mat_comp):
     for mat in mat_comp:
         ele = mat.ele
-        if not os.path.exists('neucbot/Data/Isotopes/'+ele.capitalize()):
+        if not os.path.exists('./Data/Isotopes/'+ele.capitalize()):
             if constants.download_version == 2:
                 print('\tDownloading (datset V2) data for',ele, file = sys.stdout)
-                bashcmd = './neucbot/Scripts/download_element.sh ' + ele
+                bashcmd = './Scripts/download_element.sh ' + ele
                 process = subprocess.call(bashcmd,shell=True)
             elif constants.download_version == 1:
                 print('\tDownloading (dataset V1) data for',ele, file = sys.stdout)
-                bashcmd = './neucbot/Scripts/download_element_v1.sh ' + ele
+                bashcmd = './Scripts/download_element_v1.sh ' + ele
                 process = subprocess.call(bashcmd,shell=True)
 
 
@@ -977,25 +977,25 @@ def main():
             ele = mat.ele
             basename = mat.basename
             if basename == 't':
-                with open('neucbot/Data/routes.txt', 'r') as file:
+                with open('./Data/routes.txt', 'r') as file:
                     if not os.path.exists(file.readlines()[14].rstrip()+ele.capitalize()):
                         if constants.download_version == 2:
                             print('\tDownloading (TALYS-1.95) data for', ele, file=sys.stdout)
-                            bashcmd = './neucbot/Scripts/download_element.sh ' + ele
+                            bashcmd = './neucbotUI/Scripts/download_element.sh ' + ele
                             process = subprocess.call(bashcmd, shell=True)
                         elif constants.download_version == 1:
                             print('\tDownloading (TALYS-1.6) data for', ele, file=sys.stdout)
-                            bashcmd = './neucbot/Scripts/download_element_v1.sh ' + ele
+                            bashcmd = './neucbotUI/Scripts/download_element_v1.sh ' + ele
                             process = subprocess.call(bashcmd, shell=True)
                         elif constants.download_version == "j":
                             print('\tDownloading (TALYS-1.6) data for', ele, file=sys.stdout)
-                            bashcmd = './neucbot/Scripts/download_jendl_data.sh ' + ele
+                            bashcmd = './neucbotUI/Scripts/download_jendl_data.sh ' + ele
                             process = subprocess.call(bashcmd, shell=True)
             else:
-                with open(r'neucbot/Data/routes.txt', 'r') as file:
+                with open(r'./Data/routes.txt', 'r') as file:
                     if not os.path.exists('jendl'+file.readlines()[14].rstrip()+ele.capitalize()):
                         print('ERROR: there is no folder for jendl')
-                        bashcmd = 'neucbot/Scripts/download_element_jendl.sh '
+                        bashcmd = './Scripts/download_element_jendl.sh '
 
     if constants.run_alphas:
         if constants.calculate_energy_loss:

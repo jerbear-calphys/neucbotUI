@@ -2,6 +2,7 @@ import functools
 from . import neucbot
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+from matplotlib.colors import LogNorm
 import io
 import base64
 from colour import Color
@@ -11,8 +12,6 @@ import pandas as pd
 from flask import ( # type: ignore
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
-
-#from UI.db import get_db # type: ignore
 
 bp = Blueprint('calc', __name__, url_prefix='/')
 
@@ -88,7 +87,6 @@ def calc():
             fig, tx = plt.subplots()
 
             max_prob = max(aspec_norm.values())
-            viridis_colors = [cm.viridis(i / (10_000-1)) for i in range(10_000)]
 
             #Create 2d histogram for probabilities, Alpha Energy vs Neutron Energy, normalized
 
@@ -103,7 +101,7 @@ def calc():
 
             # Plot using `pcolormesh`
             plt.figure(figsize=(8,6))
-            hx = plt.pcolormesh(xbins, ybins, histogram_data, shading='nearest', cmap='inferno')
+            hx = plt.pcolormesh( xbins, ybins, histogram_data, shading='nearest', cmap='inferno', norm = LogNorm(vmin=max_prob*1e-4, vmax=max_prob) )
             
             cbar = plt.colorbar(hx)
 
